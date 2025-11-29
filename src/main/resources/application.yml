@@ -1,0 +1,90 @@
+spring:
+  application:
+    name: spring-ai-alibaba-demo
+  
+  # Nacos 配置中心
+  cloud:
+    nacos:
+      config:
+        server-addr: ${NACOS_SERVER_ADDR:localhost:8848}
+        namespace: ${NACOS_NAMESPACE:}
+        group: ${NACOS_GROUP:DEFAULT_GROUP}
+        file-extension: yml
+      discovery:
+        server-addr: ${NACOS_SERVER_ADDR:localhost:8848}
+        namespace: ${NACOS_NAMESPACE:}
+  
+  # Redis 配置
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DATABASE:0}
+  
+  # AI 配置
+  ai:
+    alibaba:
+      access-key: ${ALIYUN_ACCESS_KEY:}
+      secret-key: ${ALIYUN_SECRET_KEY:}
+      region: ${ALIYUN_REGION:cn-hangzhou}
+      model:
+        chat:
+          default: ${AI_CHAT_MODEL:qwen-plus}
+        embedding:
+          default: ${AI_EMBEDDING_MODEL:text-embedding-v1}
+  
+# 服务器配置
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /api
+  
+# Actuator 配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.yuans.ai: DEBUG
+    org.springframework.ai: DEBUG
+    com.alibaba.cloud.ai: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/${spring.application.name}.log
+    max-size: 100MB
+    max-history: 30
+    total-size-cap: 1GB
+  
+# SkyWalking 配置
+skywalking:
+  agent:
+    service-name: ${spring.application.name}
+    collector-backend-service: ${SKYWALKING_COLLECTOR:localhost:11800}
+  
+# 自定义配置
+ai:
+  rag:
+    chunk-size: 1000
+    chunk-overlap: 200
+    retrieval-top-k: 5
+  tool:
+    timeout: 30000
+  mcp:
+    context-ttl: 86400
+    max-messages: 50
+  graph:
+    execution-timeout: 60000

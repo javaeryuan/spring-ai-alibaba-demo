@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-ai-alibaba-demo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: spring-ai-alibaba-demo
+  template:
+    metadata:
+      labels:
+        app: spring-ai-alibaba-demo
+    spec:
+      containers:
+      - name: spring-ai-alibaba-demo
+        image: spring-ai-alibaba-demo:1.0-SNAPSHOT
+        ports:
+        - containerPort: 8080
+        env:
+        - name: NACOS_SERVER_ADDR
+          value: "nacos:8848"
+        - name: REDIS_HOST
+          value: "redis"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: ALIYUN_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aliyun-credentials
+              key: access-key
+        - name: ALIYUN_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aliyun-credentials
+              key: secret-key
+        - name: ALIYUN_REGION
+          value: "cn-hangzhou"
+        - name: SPRING_PROFILES_ACTIVE
+          value: "prod"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-ai-alibaba-demo
+spec:
+  selector:
+    app: spring-ai-alibaba-demo
+  ports:
+  - port: 80
+    targetPort: 8080
+  type: ClusterIP

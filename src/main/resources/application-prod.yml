@@ -1,0 +1,65 @@
+spring:
+  # 生产环境 Redis 配置
+  data:
+    redis:
+      host: ${REDIS_HOST:redis-master}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DATABASE:0}
+  
+  # 生产环境 AI 配置
+  ai:
+    alibaba:
+      access-key: ${ALIYUN_ACCESS_KEY:}
+      secret-key: ${ALIYUN_SECRET_KEY:}
+      region: ${ALIYUN_REGION:cn-hangzhou}
+      model:
+        chat:
+          default: ${AI_CHAT_MODEL:qwen-plus}
+        embedding:
+          default: ${AI_EMBEDDING_MODEL:text-embedding-v1}
+  
+# 生产环境服务器配置
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /api
+  tomcat:
+    max-threads: ${TOMCAT_MAX_THREADS:200}
+    min-spare-threads: ${TOMCAT_MIN_SPARE_THREADS:20}
+    connection-timeout: ${TOMCAT_CONNECTION_TIMEOUT:20000}
+  
+# 生产环境日志配置
+logging:
+  level:
+    root: INFO
+    com.yuans.ai: INFO
+    org.springframework.ai: INFO
+    com.alibaba.cloud.ai: INFO
+  file:
+    name: /var/logs/${spring.application.name}.log
+    max-size: 500MB
+    max-history: 90
+    total-size-cap: 5GB
+  
+# 生产环境 Actuator 配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  
+# 生产环境自定义配置
+ai:
+  rag:
+    chunk-size: 1000
+    chunk-overlap: 200
+    retrieval-top-k: 5
+  tool:
+    timeout: 30000
+  mcp:
+    context-ttl: 86400
+    max-messages: 50
+  graph:
+    execution-timeout: 60000
